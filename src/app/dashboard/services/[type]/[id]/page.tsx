@@ -9,6 +9,7 @@ import { getServiceMeta } from '@/services/_registry/serviceMeta'
 import { ServiceRegistry } from '@/services/_registry'
 import { SubResourcePanel } from '@/components/services/_shared/SubResourcePanel'
 import { GithubActionsPanel } from '@/components/services/_shared/GithubActionsPanel'
+import { CloudflareActionsPanel } from '@/components/services/_shared/CloudflareActionsPanel'
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ type: string; id: string }> }) {
   const { type, id } = await params
@@ -57,6 +58,10 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       {type === 'github' ? (
         <section>
           <GithubActionsPanel serviceType={type} accountId={id} />
+        </section>
+      ) : type === 'cloudflare' ? (
+        <section>
+          <CloudflareActionsPanel serviceType={type} accountId={id} />
         </section>
       ) : (
         <section className="grid gap-6 xl:grid-cols-2">

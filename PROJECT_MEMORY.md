@@ -364,6 +364,21 @@ tasks:
       - /src/app/dashboard/services/[type]/[id]/page.tsx
     notes: "Implemented cache-first org/repo/workflow/run/log/secret flow for GitHub account detail. Added manual refresh semantics (refresh=1) to reduce GitHub API calls and converted GitHub detail UI to combo + action buttons workflow."
 
+
+  - task_id: T-505
+    title: "Cloudflare Service UI Optimization (cache-first actions flow)"
+    status: DONE
+    agent: chatgpt
+    started_at: 2026-04-18T18:00:00+07:00
+    completed_at: 2026-04-18T18:40:00+07:00
+    files_changed:
+      - /src/services/cloudflare/types.ts
+      - /src/services/cloudflare/CloudflareApi.ts
+      - /src/services/cloudflare/CloudflareService.ts
+      - /src/components/services/_shared/CloudflareActionsPanel.tsx
+      - /src/app/dashboard/services/[type]/[id]/page.tsx
+    notes: "Implemented Cloudflare cache-first control flow with zones/domains, nameservers, tunnels, tunnel token, connector disconnect, and DNS create/update/delete actions using combo + button interactions."
+
 found_bugs: []
 
 pending_files: []
