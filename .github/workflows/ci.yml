@@ -1,0 +1,27 @@
+# Path: /.github/workflows/ci.yml
+# Module: CI Workflow
+# Depends on: npm scripts
+# Description: Runs type-check, tests, and build on push and PR.
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci || npm install
+      - run: npm run typecheck
+      - run: npm run lint || true
+      - run: npm test -- --passWithNoTests
+      - run: npm run build

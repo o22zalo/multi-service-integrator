@@ -1,0 +1,22 @@
+# Path: /docker-compose.yml
+# Module: Local Compose Stack
+# Depends on: Dockerfile
+# Description: Local development compose definition.
+
+version: '3.9'
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      NEXTAUTH_URL: http://localhost:3000
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3

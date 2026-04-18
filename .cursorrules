@@ -1,0 +1,3 @@
+Always read /AGENTS.md, /plan.md, /STANDARDS.md, and /PROJECT_MEMORY.md before implementing a task.
+Do not modify files outside the active task scope.
+Every write operation must include audit logging.
