@@ -49,6 +49,9 @@ Cần có sẵn:
 
 ## 3. Chuẩn bị `.env`
 
+Trước khi điền biến môi trường, nên đọc thêm file `env.requirements.md` ở root project để biết cách lấy từng giá trị, link console và docs tham khảo.
+
+
 ### 3.1 Tạo file môi trường
 ```bash
 cp .env.example .env

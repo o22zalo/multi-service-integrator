@@ -1,4 +1,4 @@
-// Path: /src/app/(dashboard)/dashboard/page.tsx
+// Path: /src/app/dashboard/page.tsx
 // Module: DashboardLandingPage
 // Depends on: @/services/_registry/serviceMeta
 // Description: Protected dashboard landing page.

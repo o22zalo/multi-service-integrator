@@ -100,7 +100,7 @@ tasks:
       - /src/lib/auth/providers/supabase.ts
       - /src/lib/auth/providers/custom.ts
       - /src/app/api/auth/[...nextauth]/route.ts
-      - /src/app/(auth)/login/page.tsx
+      - /src/app/login/page.tsx
       - /src/types/next-auth.d.ts
     notes: "Implemented Auth.js with Google, Supabase, and custom credentials providers plus RTDB user upsert."
   - task_id: T-202
@@ -223,7 +223,7 @@ tasks:
       - /src/components/layout/NotificationPanel.tsx
       - /src/components/providers/AuthSessionProvider.tsx
       - /src/components/providers/DashboardSessionBridge.tsx
-      - /src/app/(dashboard)/layout.tsx
+      - /src/app/dashboard/layout.tsx
     notes: "Implemented protected shell, sidebar, header, session bridge, and notification flyout."
   - task_id: T-502
     title: "Service Dashboard Page (Generic)"
@@ -232,9 +232,9 @@ tasks:
     started_at: 2026-04-18T15:58:00+07:00
     completed_at: 2026-04-18T16:22:00+07:00
     files_changed:
-      - /src/app/(dashboard)/dashboard/page.tsx
-      - /src/app/(dashboard)/services/[type]/page.tsx
-      - /src/app/(dashboard)/services/[type]/[id]/page.tsx
+      - /src/app/dashboard/page.tsx
+      - /src/app/dashboard/services/[type]/page.tsx
+      - /src/app/dashboard/services/[type]/[id]/page.tsx
       - /src/components/services/_shared/index.ts
       - /src/components/services/_shared/AccountList.tsx
       - /src/components/services/_shared/AccountCard.tsx
@@ -251,7 +251,7 @@ tasks:
     started_at: 2026-04-18T16:22:00+07:00
     completed_at: 2026-04-18T16:30:00+07:00
     files_changed:
-      - /src/app/(dashboard)/logs/page.tsx
+      - /src/app/dashboard/logs/page.tsx
       - /src/components/logs/index.ts
       - /src/components/logs/AuditLogTable.tsx
       - /src/components/logs/OperationLogDrawer.tsx
@@ -338,3 +338,8 @@ notes: "Full scaffold and implementation pass completed across bootstrap, auth, 
 
 
 notes_addendum: "2026-04-18: Extended GitHub service with account email, workflow run/stop/log flows, actions secret management, and dedicated GitHub docs."
+
+
+standardization_notes:
+  - "Removed stale route-group references; canonical app folders are /src/app/login and /src/app/dashboard."
+  - "Generated file tsconfig.tsbuildinfo is excluded from repository."

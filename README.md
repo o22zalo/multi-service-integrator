@@ -115,6 +115,19 @@ Mỗi service được tách riêng theo hướng:
 └── DEPLOY.md
 ```
 
+
+## 5.1 Chuẩn thư mục App Router
+
+Project này đã được chuẩn hoá để **không dùng route-group folder** trong `src/app`.
+
+Dùng cấu trúc vật lý thật:
+- `src/app/login`
+- `src/app/dashboard`
+- `src/app/dashboard/services/[type]`
+- `src/app/api/...`
+
+Không dùng các thư mục kiểu `(auth)`, `(dashboard)`. Quy tắc này cũng đã được đưa vào `AGENTS.md` để agent không tạo sai cấu trúc nữa.
+
 ## 6. Luồng dữ liệu tổng quát
 
 ```text
@@ -150,6 +163,8 @@ Sensitive fields → AES-256-GCM encrypt trước khi ghi DB
 - auth thiết kế theo hướng multi-provider
 
 ## 9. Biến môi trường chính
+
+Repo đã có file `.env.example` để làm mẫu. Ngoài ra, xem thêm `env.requirements.md` để biết cách lấy từng giá trị, link console, link docs và checklist triển khai môi trường.
 
 Repo đã có file `.env.example` để làm mẫu. Tối thiểu bạn cần điền:
 

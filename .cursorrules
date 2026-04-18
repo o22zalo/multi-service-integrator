@@ -1,3 +1,5 @@
 Always read /AGENTS.md, /plan.md, /STANDARDS.md, and /PROJECT_MEMORY.md before implementing a task.
 Do not modify files outside the active task scope.
-Every write operation must include audit logging.
+Every write operation must include audit logging when the feature supports persistence.
+Do not use Next.js route-group folders such as (auth), (dashboard), (marketing). Use real folders like /src/app/login and /src/app/dashboard.
+Do not commit generated files such as tsconfig.tsbuildinfo, build caches, or local tool artifacts.

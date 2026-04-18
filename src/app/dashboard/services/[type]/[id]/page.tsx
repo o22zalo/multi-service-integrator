@@ -1,4 +1,4 @@
-// Path: /src/app/(dashboard)/services/[type]/[id]/page.tsx
+// Path: /src/app/dashboard/services/[type]/[id]/page.tsx
 // Module: ServiceDetailPage
 // Depends on: @/lib/auth/auth, @/services/_registry/serviceMeta, @/services/_registry, @/components/services/_shared/SubResourcePanel
 // Description: Shows overview and sub-resources for a service account.

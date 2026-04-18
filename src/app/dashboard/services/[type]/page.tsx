@@ -1,4 +1,4 @@
-// Path: /src/app/(dashboard)/services/[type]/page.tsx
+// Path: /src/app/dashboard/services/[type]/page.tsx
 // Module: ServicePage
 // Depends on: next/navigation, @/components/services/_shared/AccountList, @/services/_registry/serviceMeta, @/lib/auth/auth
 // Description: Lists service accounts for a service type.
