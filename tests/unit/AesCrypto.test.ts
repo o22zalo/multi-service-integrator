@@ -1,3 +1,7 @@
+// Path: /tests/unit/AesCrypto.test.ts
+// Fix: Pass TEST_KEY explicitly to encryptObject / decryptObject so the tests
+//      do not depend on the ENCRYPTION_KEY environment variable being set.
+
 import { decrypt, decryptObject, encrypt, encryptObject } from '@/lib/crypto/AesCrypto'
 
 describe('AesCrypto', () => {
@@ -29,7 +33,7 @@ describe('AesCrypto', () => {
 
   test('encryptObject encrypts only listed fields', () => {
     const obj = { token: 'secret', name: 'public', extra: 'data' }
-    const result = encryptObject(obj, ['token'])
+    const result = encryptObject(obj, ['token'], TEST_KEY)
     expect(result.token).not.toBe('secret')
     expect(result.name).toBe('public')
     expect(result.extra).toBe('data')
@@ -38,8 +42,8 @@ describe('AesCrypto', () => {
   test('encryptObject → decryptObject returns original', () => {
     const obj = { token: 'my-token', webhook_secret: 'wh-secret', name: 'github-main' }
     const fields = ['token', 'webhook_secret']
-    const encrypted = encryptObject(obj, fields)
-    const decrypted = decryptObject(encrypted, fields)
+    const encrypted = encryptObject(obj, fields, TEST_KEY)
+    const decrypted = decryptObject(encrypted, fields, TEST_KEY)
     expect(decrypted).toEqual(obj)
   })
 })

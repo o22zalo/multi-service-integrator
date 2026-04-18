@@ -1,13 +1,13 @@
 // Path: /src/components/layout/NotificationPanel.tsx
 // Module: NotificationPanel
-// Depends on: react, date-fns, @/lib/logger/OperationLogger, ./index
+// Depends on: react, date-fns, @/lib/db/LocalDb, @/lib/logger, ./index
 // Description: Displays recent operation logs in a flyout panel.
 
 'use client'
 
 import { useEffect, useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
-import { OperationLogger } from '@/lib/logger/OperationLogger'
+import { db } from '@/lib/db/LocalDb'
 import type { OperationLog } from '@/lib/logger'
 import type { NotificationPanelProps } from './index'
 
@@ -17,7 +17,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
 
   useEffect(() => {
     if (!isOpen) return
-    OperationLogger.getInstance().getRecentOps(10).then(setItems).catch(() => setItems([]))
+    db.operation_logs.orderBy('timestamp').reverse().limit(10).toArray().then(setItems).catch(() => setItems([]))
   }, [isOpen])
 
   if (!isOpen) return null

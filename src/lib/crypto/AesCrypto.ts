@@ -2,6 +2,8 @@
 // Module: AES-256-GCM Crypto
 // Depends on: crypto
 // Description: Encrypts and decrypts secrets using AES-256-GCM.
+// Fix: encryptObject / decryptObject now forward the optional keyHex parameter so
+//      they can be used in unit tests without a live ENCRYPTION_KEY env var.
 
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 
@@ -58,23 +60,38 @@ export function decrypt(ciphertext: string, keyHex?: string): string {
   }
 }
 
-/** Returns a shallow copy of the object with specific fields encrypted. */
-export function encryptObject<T extends Record<string, unknown>>(obj: T, fields: string[]): T {
+/**
+ * Returns a shallow copy of the object with specific fields encrypted.
+ * The optional `keyHex` parameter is forwarded to `encrypt()` and is useful
+ * when calling this function from tests without a live ENCRYPTION_KEY env var.
+ */
+export function encryptObject<T extends Record<string, unknown>>(
+  obj: T,
+  fields: string[],
+  keyHex?: string,
+): T {
   const clone = { ...obj } as Record<string, unknown>
   for (const field of fields) {
     if (clone[field] !== undefined && clone[field] !== null) {
-      clone[field] = encrypt(String(clone[field]))
+      clone[field] = encrypt(String(clone[field]), keyHex)
     }
   }
   return clone as T
 }
 
-/** Returns a shallow copy of the object with specific fields decrypted. */
-export function decryptObject<T extends Record<string, unknown>>(obj: T, fields: string[]): T {
+/**
+ * Returns a shallow copy of the object with specific fields decrypted.
+ * The optional `keyHex` parameter is forwarded to `decrypt()`.
+ */
+export function decryptObject<T extends Record<string, unknown>>(
+  obj: T,
+  fields: string[],
+  keyHex?: string,
+): T {
   const clone = { ...obj } as Record<string, unknown>
   for (const field of fields) {
     if (typeof clone[field] === 'string' && clone[field]) {
-      clone[field] = decrypt(String(clone[field]))
+      clone[field] = decrypt(String(clone[field]), keyHex)
     }
   }
   return clone as T

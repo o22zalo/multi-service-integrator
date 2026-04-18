@@ -360,6 +360,14 @@ notes: >
   and fetchMetadata now accept config as an optional second parameter.
   Project memory has been aligned with the actual codebase and the local plan.md
   required by AGENTS.md now exists inside the repository root.
+  Applied ZIP-aligned bugfix sync on 2026-04-18 for P0/P1/P2 items: Next.js 15
+  async params in withAuth, keyHex forwarding in AesCrypto/FieldEncryptor, fixed
+  AesCrypto tests, shard_index summary cache to remove N+1 reads in list(), and
+  lazy shard initialization for graceful dev/test mode.
+  Additional dev-run stabilization on 2026-04-18: aligned Tailwind stack to
+  tailwindcss@3.4.x with PostCSS tailwindcss/autoprefixer plugin, and removed
+  client import chain from NotificationPanel to OperationLogger that pulled in
+  firebase-admin (net/tls) on dashboard compile.
 
 standardization_notes:
   - "Removed stale route-group references; canonical app folders are /src/app/login and /src/app/dashboard."
