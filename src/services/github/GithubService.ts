@@ -13,6 +13,8 @@ import type {
   GithubHook,
   GithubOrg,
   GithubRepo,
+  GithubRepoFile,
+  GithubRepoZip,
   GithubRepoSecret,
   GithubWorkflow,
   GithubWorkflowLog,
@@ -22,7 +24,7 @@ import type {
 export class GithubService extends BaseService<
   GithubConfig,
   GithubCredential,
-  GithubRepo | GithubOrg | GithubWorkflow | GithubHook | GithubWorkflowRun | GithubRepoSecret | GithubWorkflowLog
+  GithubRepo | GithubOrg | GithubWorkflow | GithubHook | GithubWorkflowRun | GithubRepoSecret | GithubWorkflowLog | GithubRepoFile | GithubRepoZip
 > {
   readonly SERVICE_TYPE = 'github' as const
   readonly SERVICE_LABEL = 'GitHub'
@@ -133,6 +135,24 @@ export class GithubService extends BaseService<
         deleteActionLabel: 'Delete secret',
         description: 'List names of GitHub Actions secrets and create or update them.',
       },
+      {
+        type: 'repo-file',
+        label: 'Repository File',
+        icon: 'file-code-2',
+        canCreate: false,
+        canDelete: false,
+        requiresInput: ['repo_name', 'path', 'ref'],
+        description: 'Fetch file content from repository by path to view or copy.',
+      },
+      {
+        type: 'repo-zip',
+        label: 'Repository ZIP',
+        icon: 'file-archive',
+        canCreate: false,
+        canDelete: false,
+        requiresInput: ['repo_name', 'ref'],
+        description: 'Generate source ZIP download URL for selected branch/ref.',
+      },
     ]
   }
 
@@ -164,6 +184,10 @@ export class GithubService extends BaseService<
           ? `${type}_${repoName}_${workflowId ?? 'all'}`
           : type === 'workflow-logs' && repoName && params.run_id
             ? `${type}_${repoName}_${params.run_id}`
+            : type === 'repo-file' && repoName && params.path
+              ? `${type}_${repoName}_${params.path}_${params.ref ?? 'main'}`
+              : type === 'repo-zip' && repoName
+                ? `${type}_${repoName}_${params.ref ?? 'main'}`
             : (type === 'webhooks' || type === 'secrets') && repoName
               ? `${type}_${repoName}`
               : type
@@ -213,6 +237,20 @@ export class GithubService extends BaseService<
         const secrets = await api.listRepoSecrets(owner, repoName)
         await this.saveSubResources(uid, accountId, cacheKey, secrets as unknown as Record<string, unknown>[])
         return secrets
+      }
+      case 'repo-file': {
+        if (!repoName || !params.path) return []
+        const ref = typeof params.ref === 'string' && params.ref.trim() ? params.ref : 'main'
+        const file = await api.getRepoFile(owner, repoName, params.path, ref)
+        await this.saveSubResources(uid, accountId, `${type}_${repoName}_${params.path}_${ref}`, [file as unknown as Record<string, unknown>])
+        return [file]
+      }
+      case 'repo-zip': {
+        if (!repoName) return []
+        const ref = typeof params.ref === 'string' && params.ref.trim() ? params.ref : 'main'
+        const zip = api.getRepoZipUrl(owner, repoName, ref)
+        await this.saveSubResources(uid, accountId, `${type}_${repoName}_${ref}`, [zip as unknown as Record<string, unknown>])
+        return [zip]
       }
       default:
         return []

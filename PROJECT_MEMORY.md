@@ -379,6 +379,31 @@ tasks:
       - /src/app/dashboard/services/[type]/[id]/page.tsx
     notes: "Implemented Cloudflare cache-first control flow with zones/domains, nameservers, tunnels, tunnel token, connector disconnect, and DNS create/update/delete actions using combo + button interactions."
 
+
+  - task_id: T-506
+    title: "GitHub repo file/zip actions + Azure DevOps service"
+    status: DONE
+    agent: chatgpt
+    started_at: 2026-04-18T19:00:00+07:00
+    completed_at: 2026-04-18T20:00:00+07:00
+    files_changed:
+      - /src/services/github/types.ts
+      - /src/services/github/GithubApi.ts
+      - /src/services/github/GithubService.ts
+      - /src/components/services/_shared/GithubActionsPanel.tsx
+      - /src/services/azure/types.ts
+      - /src/services/azure/AzureSchema.ts
+      - /src/services/azure/AzureApi.ts
+      - /src/services/azure/AzureService.ts
+      - /src/services/azure/index.ts
+      - /src/components/services/_shared/AzureActionsPanel.tsx
+      - /src/services/_registry/index.ts
+      - /src/services/_registry/serviceMeta.ts
+      - /src/services/_registry/serviceForms.ts
+      - /src/types/service.d.ts
+      - /src/app/dashboard/services/[type]/[id]/page.tsx
+    notes: "Added GitHub repository zip + file-content actions and introduced Azure DevOps PAT-based service with cache-first project/repo/pipeline/run/file/zip workflows and dedicated UI panel."
+
 found_bugs: []
 
 pending_files: []

@@ -43,6 +43,10 @@ export function GithubActionsPanel({ serviceType, accountId }: GithubActionsPane
   const [secretName, setSecretName] = useState('')
   const [secretValue, setSecretValue] = useState('')
   const [logsPreview, setLogsPreview] = useState('')
+  const [filePath, setFilePath] = useState('/README.md')
+  const [fileRef, setFileRef] = useState('main')
+  const [fileContent, setFileContent] = useState('')
+  const [zipUrl, setZipUrl] = useState('')
   const [message, setMessage] = useState('')
   const [isBusy, setIsBusy] = useState(false)
 
@@ -237,6 +241,55 @@ export function GithubActionsPanel({ serviceType, accountId }: GithubActionsPane
     }
   }
 
+  async function loadRepoFile(refresh = false) {
+    if (!selectedRepo || !filePath) return
+    setIsBusy(true)
+    setMessage('')
+    try {
+      const rows = await fetchSubType('repo-file', {
+        repo_name: selectedRepo,
+        path: filePath,
+        ref: fileRef || 'main',
+      }, refresh)
+      const first = (rows[0] ?? {}) as { content?: string }
+      setFileContent(first.content ?? '')
+      setMessage('Đã tải nội dung file repository.')
+    } catch (error) {
+      setMessage(String((error as Error).message ?? 'Không thể tải nội dung file'))
+    } finally {
+      setIsBusy(false)
+    }
+  }
+
+  async function loadRepoZip(refresh = false) {
+    if (!selectedRepo) return
+    setIsBusy(true)
+    setMessage('')
+    try {
+      const rows = await fetchSubType('repo-zip', {
+        repo_name: selectedRepo,
+        ref: fileRef || 'main',
+      }, refresh)
+      const first = (rows[0] ?? {}) as { download_url?: string }
+      setZipUrl(first.download_url ?? '')
+      setMessage('Đã chuẩn bị link ZIP repository.')
+    } catch (error) {
+      setMessage(String((error as Error).message ?? 'Không thể lấy link ZIP'))
+    } finally {
+      setIsBusy(false)
+    }
+  }
+
+  async function copyFileContent() {
+    if (!fileContent) return
+    try {
+      await navigator.clipboard.writeText(fileContent)
+      setMessage('Đã copy nội dung file.')
+    } catch {
+      setMessage('Trình duyệt không cho phép copy tự động.')
+    }
+  }
+
   const selectedRun = useMemo(
     () => runs.find((item) => String(item.id) === selectedRunId),
     [runs, selectedRunId],
@@ -310,6 +363,30 @@ export function GithubActionsPanel({ serviceType, accountId }: GithubActionsPane
         <input value={secretValue} onChange={(e) => setSecretValue(e.target.value)} className="msi-field text-sm" placeholder="Secret value" />
         <button type="button" className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-medium text-white hover:bg-sky-400" onClick={saveSecret} disabled={isBusy || !selectedRepo || !secretName || !secretValue}>Add / Update secret</button>
       </div>
+
+      <div className="grid gap-3 rounded-2xl border border-slate-800 bg-slate-950 p-4 md:grid-cols-3">
+        <input value={filePath} onChange={(e) => setFilePath(e.target.value)} className="msi-field text-sm" placeholder="File path (e.g. /README.md)" />
+        <input value={fileRef} onChange={(e) => setFileRef(e.target.value)} className="msi-field text-sm" placeholder="Branch/ref (e.g. main)" />
+        <div className="flex gap-2">
+          <button type="button" className="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800" onClick={() => loadRepoFile(false)} disabled={isBusy || !selectedRepo || !filePath}>View file (cache)</button>
+          <button type="button" className="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800" onClick={() => loadRepoFile(true)} disabled={isBusy || !selectedRepo || !filePath}>Refresh file</button>
+        </div>
+        <button type="button" className="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800" onClick={() => loadRepoZip(false)} disabled={isBusy || !selectedRepo}>Load ZIP (cache)</button>
+        <button type="button" className="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800" onClick={() => loadRepoZip(true)} disabled={isBusy || !selectedRepo}>Refresh ZIP</button>
+        <button type="button" className="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800" onClick={copyFileContent} disabled={!fileContent}>Copy content</button>
+        {zipUrl ? (
+          <a href={zipUrl} target="_blank" rel="noreferrer" className="md:col-span-3 inline-flex rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800">
+            Download ZIP: {zipUrl}
+          </a>
+        ) : null}
+      </div>
+
+      {fileContent ? (
+        <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+          <p className="mb-2 text-sm text-slate-300">Repository file content</p>
+          <pre className="max-h-96 overflow-auto whitespace-pre-wrap text-xs text-slate-400">{fileContent}</pre>
+        </div>
+      ) : null}
 
       {logsPreview ? (
         <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">

@@ -100,6 +100,21 @@ export interface GithubWorkflowLog {
   preview: string
 }
 
+export interface GithubRepoFile {
+  repo_name: string
+  path: string
+  ref: string
+  encoding?: string
+  size?: number
+  content: string
+}
+
+export interface GithubRepoZip {
+  repo_name: string
+  ref: string
+  download_url: string
+}
+
 export interface GithubUser {
   id: number
   login: string
