@@ -9,6 +9,7 @@ import JSZip from 'jszip'
 import type {
   CreateHookInput,
   GithubHook,
+  GithubOrg,
   GithubRepo,
   GithubRepoSecret,
   GithubUser,
@@ -42,6 +43,11 @@ export class GithubApi {
   /** Lists repositories for the authenticated user. */
   async listRepos(page = 1, perPage = 100): Promise<GithubRepo[]> {
     return this.request<GithubRepo[]>(`/user/repos?per_page=${Math.min(perPage, 100)}&page=${page}&sort=updated`)
+  }
+
+  /** Lists organizations available to the authenticated user. */
+  async listOrgs(): Promise<GithubOrg[]> {
+    return this.request<GithubOrg[]>('/user/orgs?per_page=100')
   }
 
   /** Lists all repositories by paginating until the last page. */

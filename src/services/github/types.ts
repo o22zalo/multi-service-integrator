@@ -32,6 +32,18 @@ export interface GithubRepo {
   updated_at: string
   html_url: string
   clone_url: string
+  owner?: {
+    login: string
+  }
+}
+
+export interface GithubOrg {
+  id: number
+  login: string
+  avatar_url: string
+  url: string
+  repos_url: string
+  description?: string | null
 }
 
 export interface GithubWorkflow {

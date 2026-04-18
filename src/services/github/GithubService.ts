@@ -11,6 +11,7 @@ import type {
   GithubConfig,
   GithubCredential,
   GithubHook,
+  GithubOrg,
   GithubRepo,
   GithubRepoSecret,
   GithubWorkflow,
@@ -21,7 +22,7 @@ import type {
 export class GithubService extends BaseService<
   GithubConfig,
   GithubCredential,
-  GithubRepo | GithubWorkflow | GithubHook | GithubWorkflowRun | GithubRepoSecret | GithubWorkflowLog
+  GithubRepo | GithubOrg | GithubWorkflow | GithubHook | GithubWorkflowRun | GithubRepoSecret | GithubWorkflowLog
 > {
   readonly SERVICE_TYPE = 'github' as const
   readonly SERVICE_LABEL = 'GitHub'
@@ -62,6 +63,14 @@ export class GithubService extends BaseService<
   /** Returns supported GitHub sub-resource types. */
   getSubResourceTypes(): SubResourceDef[] {
     return [
+      {
+        type: 'orgs',
+        label: 'Organizations',
+        icon: 'building-2',
+        canCreate: false,
+        canDelete: false,
+        description: 'List organizations available to this account.',
+      },
       {
         type: 'repos',
         label: 'Repositories',
@@ -127,47 +136,82 @@ export class GithubService extends BaseService<
     ]
   }
 
+  private getCacheFromNode(node: Record<string, unknown>, cacheKey: string) {
+    const subResources = (node.sub_resources ?? {}) as Record<string, Record<string, unknown>>
+    const cached = subResources[cacheKey]
+    if (!cached) return null
+    return Object.values(cached)
+  }
+
+  private async loadCachedSubResources(uid: string, accountId: string, cacheKey: string) {
+    const raw = await this.loadNode(uid, accountId)
+    return this.getCacheFromNode(raw.node as unknown as Record<string, unknown>, cacheKey)
+  }
+
   /** Fetches GitHub sub-resources using optional query params. */
   async fetchSubResources(type: string, accountId: string, uid: string, params: Record<string, string> = {}) {
     const { config, credentials } = await this.load(uid, accountId)
     const api = new GithubApi(credentials.token)
     const owner = String(config.owner)
+    const shouldRefresh = params.refresh === '1' || params.refresh === 'true'
+
+    const repoName = typeof params.repo_name === 'string' ? params.repo_name : ''
+    const workflowId = params.workflow_id ? Number(params.workflow_id) : undefined
+    const cacheKey =
+      type === 'workflows' && repoName
+        ? `${type}_${repoName}`
+        : type === 'workflow-runs' && repoName
+          ? `${type}_${repoName}_${workflowId ?? 'all'}`
+          : type === 'workflow-logs' && repoName && params.run_id
+            ? `${type}_${repoName}_${params.run_id}`
+            : (type === 'webhooks' || type === 'secrets') && repoName
+              ? `${type}_${repoName}`
+              : type
+
+    if (!shouldRefresh) {
+      const cached = await this.loadCachedSubResources(uid, accountId, cacheKey)
+      if (cached) return cached
+    }
 
     switch (type) {
+      case 'orgs': {
+        const orgs = await api.listOrgs()
+        await this.saveSubResources(uid, accountId, type, orgs as unknown as Record<string, unknown>[])
+        return orgs
+      }
       case 'repos': {
         const repos = await api.listAllRepos()
         await this.saveSubResources(uid, accountId, type, repos as unknown as Record<string, unknown>[])
         return repos
       }
       case 'workflows': {
-        if (!params.repo_name) return []
-        const workflows = await api.listWorkflows(owner, params.repo_name)
-        await this.saveSubResources(uid, accountId, `${type}_${params.repo_name}`, workflows as unknown as Record<string, unknown>[])
+        if (!repoName) return []
+        const workflows = await api.listWorkflows(owner, repoName)
+        await this.saveSubResources(uid, accountId, cacheKey, workflows as unknown as Record<string, unknown>[])
         return workflows
       }
       case 'workflow-runs': {
-        if (!params.repo_name) return []
-        const workflowId = params.workflow_id ? Number(params.workflow_id) : undefined
-        const runs = await api.listWorkflowRuns(owner, params.repo_name, workflowId)
-        await this.saveSubResources(uid, accountId, `${type}_${params.repo_name}_${workflowId ?? 'all'}`, runs as unknown as Record<string, unknown>[])
+        if (!repoName) return []
+        const runs = await api.listWorkflowRuns(owner, repoName, workflowId)
+        await this.saveSubResources(uid, accountId, cacheKey, runs as unknown as Record<string, unknown>[])
         return runs
       }
       case 'workflow-logs': {
-        if (!params.repo_name || !params.run_id) return []
-        const logs = await api.getWorkflowRunLogs(owner, params.repo_name, Number(params.run_id))
-        await this.saveSubResources(uid, accountId, `${type}_${params.repo_name}_${params.run_id}`, [logs as unknown as Record<string, unknown>])
+        if (!repoName || !params.run_id) return []
+        const logs = await api.getWorkflowRunLogs(owner, repoName, Number(params.run_id))
+        await this.saveSubResources(uid, accountId, cacheKey, [logs as unknown as Record<string, unknown>])
         return [logs]
       }
       case 'webhooks': {
-        if (!params.repo_name) return []
-        const hooks = await api.listHooks(owner, params.repo_name)
-        await this.saveSubResources(uid, accountId, `${type}_${params.repo_name}`, hooks as unknown as Record<string, unknown>[])
+        if (!repoName) return []
+        const hooks = await api.listHooks(owner, repoName)
+        await this.saveSubResources(uid, accountId, cacheKey, hooks as unknown as Record<string, unknown>[])
         return hooks
       }
       case 'secrets': {
-        if (!params.repo_name) return []
-        const secrets = await api.listRepoSecrets(owner, params.repo_name)
-        await this.saveSubResources(uid, accountId, `${type}_${params.repo_name}`, secrets as unknown as Record<string, unknown>[])
+        if (!repoName) return []
+        const secrets = await api.listRepoSecrets(owner, repoName)
+        await this.saveSubResources(uid, accountId, cacheKey, secrets as unknown as Record<string, unknown>[])
         return secrets
       }
       default:

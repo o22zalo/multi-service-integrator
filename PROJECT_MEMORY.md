@@ -349,6 +349,21 @@ tasks:
       - /PROJECT_MEMORY.md
     notes: "Initialized and fully updated project memory for all tasks."
 
+
+  - task_id: T-504
+    title: "GitHub Service UI Optimization (cache-first actions flow)"
+    status: DONE
+    agent: chatgpt
+    started_at: 2026-04-18T17:10:00+07:00
+    completed_at: 2026-04-18T17:45:00+07:00
+    files_changed:
+      - /src/services/github/types.ts
+      - /src/services/github/GithubApi.ts
+      - /src/services/github/GithubService.ts
+      - /src/components/services/_shared/GithubActionsPanel.tsx
+      - /src/app/dashboard/services/[type]/[id]/page.tsx
+    notes: "Implemented cache-first org/repo/workflow/run/log/secret flow for GitHub account detail. Added manual refresh semantics (refresh=1) to reduce GitHub API calls and converted GitHub detail UI to combo + action buttons workflow."
+
 found_bugs: []
 
 pending_files: []
