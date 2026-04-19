@@ -1,12 +1,13 @@
-[opullbranch] 2026-04-19 10:34:01 +0700
-source_branch=codex/optimize-github-services-for-account-handling
+[opullbranch] 2026-04-19 10:30:00 +0700
+source_branch=feat/performance-cache-swr
 source_remote=o.url
-commits_ahead=5
-latest_commit=1adc8c4 fix(azure): support PAT-only onboarding and org discovery
+commits_ahead=1
+latest_commit=perf: add API cache, client SWR, background prefetch for service lists
 changes:
-- fix(azure): support PAT-only onboarding and org discovery
-- feat(firebase): replicate records across all shards with backfill
-- feat: add github file/zip actions and new azure devops service
-- feat(cloudflare): add cache-first tunnel and DNS control flow
-- feat(github): optimize actions flow with cache-first controls
-
+- feat(cache): ApiCache — server-side in-memory TTL cache + in-flight dedup for route handlers
+- feat(cache): ClientCache — browser SWR cache (stale 15s / expire 60s) + subscribe pattern
+- perf(api): GET /api/services/[type] cached 30s, invalidated on POST/PUT/DELETE
+- perf(hooks): useServiceAccounts rewritten with instant stale display + background revalidation
+- feat(hooks): usePrefetch — background warmup all services 800ms after AppShell mount
+- feat(layout): Sidebar prefetch-on-hover → data ready before user clicks
+- ux(AccountList): split isLoading (first load) vs isRevalidating (bg refresh) — no more skeleton when stale data exists
