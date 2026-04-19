@@ -404,6 +404,18 @@ tasks:
       - /src/app/dashboard/services/[type]/[id]/page.tsx
     notes: "Added GitHub repository zip + file-content actions and introduced Azure DevOps PAT-based service with cache-first project/repo/pipeline/run/file/zip workflows and dedicated UI panel."
 
+
+  - task_id: T-507
+    title: "RTDB multi-project replication + backfill sync"
+    status: DONE
+    agent: chatgpt
+    started_at: 2026-04-19T08:10:00+00:00
+    completed_at: 2026-04-19T09:00:00+00:00
+    files_changed:
+      - /src/lib/firebase/ShardManager.ts
+      - /src/lib/firebase/index.ts
+    notes: "Implemented multi-project replication markers (replicatedShards), fixed shard_index placement on deterministic index shard, added read fallback across shards, and background backfill for newly added shards so old records sync once and are marked to avoid re-sync loops."
+
 found_bugs: []
 
 pending_files: []
